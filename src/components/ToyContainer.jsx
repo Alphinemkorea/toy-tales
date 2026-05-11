@@ -1,9 +1,23 @@
-import React from "react";
 import ToyCard from "./ToyCard";
 
-function ToyContainer() {
+function ToyContainer({ toys, onDelete, onLike }) {
   return (
-    <div id="toy-collection">{/* Render the collection of ToyCards */}</div>
+    <div className="card-container">
+      {toys && toys.length > 0 ? (
+        toys.map((toy) => (
+          <ToyCard
+            key={toy.id}
+            toy={toy}
+            onDelete={onDelete}
+            onLike={onLike}
+          />
+        ))
+      ) : (
+        <p style={{ textAlign: "center" }}>
+          No toys found...
+        </p>
+      )}
+    </div>
   );
 }
 
