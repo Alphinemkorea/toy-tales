@@ -41,7 +41,7 @@ function App() {
 
       {/* TOGGLE FORM */}
       <button onClick={() => setShowForm((prev) => !prev)}>
-        Add a Toy
+        Create New Toy
       </button>
 
       {/* FORM */}
