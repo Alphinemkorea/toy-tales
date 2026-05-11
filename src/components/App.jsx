@@ -1,79 +1,68 @@
 import { useEffect, useState } from "react";
-import Header from "./Header";
+import ToyCard from "./ToyCard";
 import ToyForm from "./ToyForm";
-import ToyContainer from "./ToyContainer";
 
 function App() {
   const [toys, setToys] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
-  // GET toys
+  // FETCH TOYS ON LOAD
   useEffect(() => {
     fetch("http://localhost:3001/toys")
       .then((res) => res.json())
-      .then((data) => setToys(data))
-      .catch((err) => console.log("Fetch error:", err));
+      .then((data) => {
+        setToys(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => console.log("FETCH ERROR:", err));
   }, []);
 
-  // ADD toy (POST)
-  function addToy(newToy) {
-    fetch("http://localhost:3001/toys", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newToy),
-    })
-      .then((res) => res.json())
-      .then((data) => setToys([...toys, data]));
+  // CREATE TOY
+  function handleAddToy(newToy) {
+    setToys((prev) => [...prev, newToy]);
   }
 
-  // DELETE toy
+  // LIKE TOY (UPDATE STATE AFTER PATCH)
+  function handleLike(updatedToy) {
+    setToys((prev) =>
+      prev.map((toy) => (toy.id === updatedToy.id ? updatedToy : toy))
+    );
+  }
+
+  // DELETE TOY (REMOVE FROM STATE AFTER DELETE)
   function handleDelete(id) {
-    fetch(`http://localhost:3001/toys/${id}`, {
-      method: "DELETE",
-    }).then(() => {
-      setToys(toys.filter((toy) => toy.id !== id));
-    });
-  }
-
-  // LIKE toy (PATCH)
-  function handleLike(toy) {
-    fetch(`http://localhost:3001/toys/${toy.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        likes: toy.likes + 1,
-      }),
-    })
-      .then((res) => res.json())
-      .then((updatedToy) => {
-        setToys(
-          toys.map((t) =>
-            t.id === updatedToy.id ? updatedToy : t
-          )
-        );
-      });
+    setToys((prev) => prev.filter((toy) => toy.id !== id));
   }
 
   return (
-    <>
-      <Header />
+    <div>
+      <header>
+        <h1>Toy App</h1>
+      </header>
 
-      <button onClick={() => setShowForm(!showForm)}>
+      {/* TOGGLE FORM */}
+      <button onClick={() => setShowForm((prev) => !prev)}>
         Add a Toy
       </button>
 
-      {showForm && <ToyForm addToy={addToy} />}
+      {/* FORM */}
+      {showForm && <ToyForm onAddToy={handleAddToy} />}
 
-      <ToyContainer
-        toys={toys}
-        onDelete={handleDelete}
-        onLike={handleLike}
-      />
-    </>
+      {/* TOY LIST */}
+      <div className="card-container">
+        {toys.length > 0 ? (
+          toys.map((toy) => (
+            <ToyCard
+              key={toy.id}
+              toy={toy}
+              onLike={handleLike}
+              onDelete={handleDelete}
+            />
+          ))
+        ) : (
+          <p style={{ textAlign: "center" }}>No toys found...</p>
+        )}
+      </div>
+    </div>
   );
 }
 

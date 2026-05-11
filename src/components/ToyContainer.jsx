@@ -3,7 +3,7 @@ import ToyCard from "./ToyCard";
 function ToyContainer({ toys, onDelete, onLike }) {
   return (
     <div className="card-container">
-      {toys && toys.length > 0 ? (
+      {toys.length > 0 ? (
         toys.map((toy) => (
           <ToyCard
             key={toy.id}
@@ -13,9 +13,7 @@ function ToyContainer({ toys, onDelete, onLike }) {
           />
         ))
       ) : (
-        <p style={{ textAlign: "center" }}>
-          No toys found...
-        </p>
+        <p>No toys found...</p>
       )}
     </div>
   );
